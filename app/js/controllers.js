@@ -26,10 +26,9 @@ angular.module('opennms.controllers', [])
   .controller('MyCtrl2', ['$scope', '$routeParams', '$http', function($scope, $routeParams, $http) {
 
   }])
-  .controller('NavBarController', ['$scope', '$log', function($scope, $log) {
-    $scope.$log = $log;
+  .controller('NavBarController', ['$scope', function($scope) {
     $scope.links = [
-        {'name': 'Node List', 'url': '#/element/nodeList', 'display': true},
+        {'name': 'Node List', 'url': '#/element/nodelist', 'display': true},
         {'name': 'Search', 'url': '#/element', 'display': true},
         {'name': 'Outages', 'url': '#/outages', 'display': true},
         {'name': 'Path Outages', 'url': '#/pathOutages', 'display': true},
@@ -71,7 +70,10 @@ angular.module('opennms.controllers', [])
   .controller('NotificationsController', ['$scope', function($scope) {
 
   }])
-  .controller('AssetsController', ['$scope', function($scope) {
+  .controller('AssetController', ['$scope', function($scope) {
+
+  }])
+  .controller('AssetListController', ['$scope', function($scope) {
 
   }])
   .controller('ReportsController', ['$scope', function($scope) {

@@ -6,98 +6,92 @@
 </jsp:include>
 -->
 
-<div class="TwoColLeft">
+<div class="TwoColLeft" >
     <h3>Search for Nodes</h3>
     <div class="boxWrapper">
-        <form action="element/nodeList.htm" method="get">
-            <p align="right">Name containing:          
+        <form action="#/element/nodelist" method="get">
+            <div class="right">Name containing:
                 <input type="hidden" name="listInterfaces" value="false"/>
                 <input type="text" name="nodename" />
-                <input type="submit" value="Search"/></p>                
+                <input type="submit" value="Search"/></div>
         </form>
 
-        <form action="element/nodeList.htm" method="get">
-            <p align="right">TCP/IP Address like:          
+        <form action="#/element/nodelist" method="get">
+            <div class="right">TCP/IP Address like:
                 <input type="hidden" name="listInterfaces" value="false"/>
                 <input type="text" name="iplike" value="*.*.*.*" />
-                <input type="submit" value="Search"/></p>                
+                <input type="submit" value="Search"/></div>
         </form>
 
-        <form action="element/nodeList.htm" method="get">
-            <p align="right">
+        <form action="#/element/nodelist" method="get">
+            <div class="right">
                 <select name="snmpParm" size="1">
-                    <option>ifAlias</option> 
+                    <option>ifAlias</option>
                     <option>ifName</option>
                     <option>ifDescr</option>
                 </select>
                 <select name="snmpParmMatchType" size="1">
-                    <option>contains</option> 
+                    <option>contains</option>
                     <option>equals</option>
-                </select>:        
+                </select>:
                 <input type="hidden" name="listInterfaces" value="false"/>
                 <input type="text" name="snmpParmValue" />
-                <input type="submit" value="Search"/></p>                
+                <input type="submit" value="Search"/></div>
         </form>
 
-        <form action="element/nodeList.htm" method="get">
-            <p align="right">Providing service:          
+        <form action="#/element/nodelist" method="get">
+            <div class="right">Providing service:
                 <input type="hidden" name="listInterfaces" value="false"/>
                 <select name="service" size="1">
-                    <% for (String name : serviceNameList) { %>
-                    <option value="<%=serviceNameMap.get(name)%>"><%=name%></option>
-                    <% } %>          
+                    <option value="{{service.value}}" ng-repeat="service in services">{{service.name}}</option>
                 </select>
-                <input type="submit" value="Search"/></p>                
+                <input type="submit" value="Search"/></div>
         </form>
 
-        <form action="element/nodeList.htm" method="get">
-            <p align="right">MAC Address like:          
+        <form action="#/element/nodelist" method="get">
+            <div class="right">MAC Address like:
                 <input type="hidden" name="listInterfaces" value="false"/>
                 <input type="text" name="maclike" />
-                <input type="submit" value="Search"/></p>                
+                <input type="submit" value="Search"/></div>
         </form>
 
-        <form action="element/nodeList.htm" method="get">
-            <p align="right">Foreign Source name like:
+        <form action="#/element/nodelist" method="get">
+            <div class="right">Foreign Source name like:
                 <input type="hidden" name="listInterfaces" value="false"/>
                 <input type="text" name="foreignSource"/>
                 <input type="submit" value="Search"/>
-            </p>
+            </div>
         </form>
 
         <ul class="plain">
-            <li><a href="element/nodeList.htm">All nodes</a></li>
-            <li><a href="element/nodeList.htm?listInterfaces=true">All nodes and their interfaces</a></li>
+            <li><a href="#/element/nodelist">All nodes</a></li>
+            <li><a href="#/element/nodelist?listInterfaces=true">All nodes and their interfaces</a></li>
         </ul>
     </div>
 
     <h3>Search Asset Information</h3>
     <div class="boxWrapper">
-        <%-- category --%>
-        <form action="asset/nodelist.jsp" method="get">
-            <p align="right">Category: 
+        <!-- category -->
+        <form action="#/asset/nodelist" method="get">
+            <div class="right">Category:
                 <input type="hidden" name="column" value="category" />
                 <select name="searchvalue" size="1">
-                    <% for( int i=0; i < Asset.CATEGORIES.length; i++ ) { %>
-                    <option><%=Asset.CATEGORIES[i]%></option> 
-                    <% } %>
+                    <option ng-repeat="cat in asset.categories">{{cat}}</option>
                 </select>
                 <input type="submit" value="Search" />
-            </p>
+                </div>
         </form>
 
-        <form action="asset/nodelist.jsp" method="get">
-            <p align="right">Field:
+        <form action="#/asset/nodelist" method="get">
+            <div class="right">Field:
                 <select name="column" size="1">
-                    <% for( int i=0; i < this.columns.length; i++ ) { %>
-                    <option value="<%=this.columns[i][1]%>"><%=this.columns[i][0]%></option>
-                    <% } %>
+                    <option ng-repeat="field in asset.fields" value="{{field.value}}">{{field.name}}</option>
                 </select><br />
                 Containing text: <input type="text" name="searchvalue" />
-                <input type="submit" value="Search" /></p>
+                <input type="submit" value="Search" /></div>
         </form>
         <ul class="plain">
-            <li><a href="asset/nodelist.jsp?column=_allNonEmpty">All nodes with asset info</a></li>
+            <li><a href="#/asset/nodelist?column=_allNonEmpty">All nodes with asset info</a></li>
         </ul>
     </div>
 </div>
@@ -105,9 +99,9 @@
 
 <div class="TwoColRight">
     <h3>Search Options</h3>
-    <div class="boxWrapper"> 
+    <div class="boxWrapper">
         <p>Searching by name is a case-insensitive, inclusive search. For example,
-            searching on <em>serv</em> would find any of <em>serv</em>, <em>Service</em>, 
+            searching on <em>serv</em> would find any of <em>serv</em>, <em>Service</em>,
             <em>Reserved</em>, <em>NTSERV</em>, <em>UserVortex</em>, etc. The underscore
             character acts as a single character wildcard. The percent character acts as a multiple
             character wildcard.
