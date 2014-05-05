@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" ng-app="opennms" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" ng-app="opennms" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" ng-app="opennms" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en" ng-app="opennms" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>OpenNMS Web Console</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/app.css"/>
+        <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
+    </head>
+    <body ng-controller="onmsController">
+        <!-- Header -->
+        <div id="header">
+            <h1 id="headerlogo"><a href="index.html"><img src="images/logo.png" alt="OpenNMS Web Console Home"/></a></h1>  
+            <div id="headerinfo">
+                <h2>{{page.title}}</h2>
+                <div ng-switch="user.loggedin">
+                    <div ng-switch-when="true">
+                        User: <a href="account/selfService/index.jsp" title="Account self-service"><strong>{{user.name}}</strong></a>&nbsp;
+                        (Notices <span notice-status="status"></span>)
+                        - <a href="logout.html">Log out</a><br/>
+                    </div>
+                    <div ng-switch-default>
+                        User: &hellip;<br/>
+                    </div>
+                    <span my-current-time="format"></span>
+                </div>
+            </div>
+            <hr />
+            <div id="headernavbarright" ng-switch on="!page.nonavbar && user.loggedin">
+                <div ng-switch-when="true" class="navbar" ng-controller="NavBarController">
+                    <ul>
+                        <li ng-repeat="link in links">
+                            <a href="{{link.url}}" ng-if="link.display">{{link.name}}</a>
+                            <span ng-if="!link.display">{{link.name}}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div ng-switch-default="false" ng-if="!page.nofaq" class="navbar">
+                    <ul>
+                        <li class="last"><a href="http://www.opennms.org/index.php/FAQ">FAQs</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="spacer"><!-- --></div>
+        </div>
+        <div id="content">
+            <div class="onms">
+                <h2>
+                    <a href="index.html">Home</a>
+                    <span ng-if="page.nonavbar && user.loggedin && page.nobreadcrumbs">
+                        <div ng-repeat="breadcrumb in breadcrumbs">
+                            / <a href="{{breadcrumb.url}}">{{breadcrumb.name}}</a>
+                        </div>
+
+                    </span>
+                </h2>
+            </div>
+
+            <ul class="menu">
+                <li><a href="#/view1">view1</a></li>
+                <li><a href="#/view2">view2</a></li>
+                <li><a href="#/outages">Outages</a></li>
+                <li><a href="#/pathOutages">Path Outages</a></li>
+            </ul>
+
+            <!--[if lt IE 7]>
+                <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+            <![endif]-->
+
+            <div ng-view></div>
+
+            <div>Angular seed app: v<span app-version></span></div>
+
+        </div>
+        <div id="prefooter"></div>
+
+        <div id="footer">
+            <p>
+                OpenNMS <a href="support/about.jsp">Copyright</a> &copy; 2002-2014
+                <a href="http://www.opennms.com/">The OpenNMS Group, Inc.</a>
+                OpenNMS&reg; is a registered trademark of
+                <a href="http://www.opennms.com">The OpenNMS Group, Inc.</a>
+            </p>
+        </div>
+
+        <!-- In production use:
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
+        -->
+        <script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/angular-route/angular-route.js"></script>
+        <script src="js/app.js"></script>
+        <script src="js/services.js"></script>
+        <script src="js/controllers.js"></script>
+        <script src="js/filters.js"></script>
+        <script src="js/directives.js"></script>
+    </body>
+</html>

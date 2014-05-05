@@ -1,0 +1,8 @@
+<div class="navbar" ng-controller="NavBarController">
+    <ul>
+        <li ng-repeat="link in links">
+            <a href="link.url" ng-if="link.display">{{link.name}}</a>
+            <span ng-if="!link.display">{{link.name}}</span>
+        </li>
+    </ul>
+</div>
