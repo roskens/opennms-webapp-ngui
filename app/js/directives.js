@@ -1,6 +1,10 @@
 'use strict';
 
-/* Directives */
+/**
+ * Directives
+ * 
+ * Directives are attributes for html tags.
+ */
 
 
 angular.module('opennms.directives', [])

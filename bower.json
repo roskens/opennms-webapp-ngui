@@ -1,14 +1,17 @@
 {
-  "name": "angular-seed",
+  "name": "opennms-webapp-ngui",
   "description": "A starter project for AngularJS",
-  "version": "0.0.0",
-  "homepage": "https://github.com/angular/angular-seed",
+  "version": "0.0.1",
+  "homepage": "https://github.com/roskens/opennms-webapp-ngui",
   "license": "MIT",
   "private": true,
   "dependencies": {
     "angular": "1.2.x",
     "angular-route": "1.2.x",
     "angular-loader": "1.2.x",
+    "angular-ui": "0.4.x",
+    "angular-ui-bootstrap": "0.11.x",
+    "angular-ui-router": "0.2.x",
     "angular-mocks": "~1.2.x",
     "html5-boilerplate": "~4.3.0"
   }
