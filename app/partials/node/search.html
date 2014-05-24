@@ -10,21 +10,21 @@
     <h3>Search for Nodes</h3>
     <div class="boxWrapper">
         <form action="#/element/nodelist" method="get">
-            <div class="right">Name containing:
+            <p class="right">Name containing:
                 <input type="hidden" name="listInterfaces" value="false"/>
                 <input type="text" name="nodename" />
-                <input type="submit" value="Search"/></div>
+                <input type="submit" value="Search"/></p>
         </form>
 
         <form action="#/element/nodelist" method="get">
-            <div class="right">TCP/IP Address like:
+            <p class="right">TCP/IP Address like:
                 <input type="hidden" name="listInterfaces" value="false"/>
                 <input type="text" name="iplike" value="*.*.*.*" />
-                <input type="submit" value="Search"/></div>
+                <input type="submit" value="Search"/></p>
         </form>
 
         <form action="#/element/nodelist" method="get">
-            <div class="right">
+            <p class="right">
                 <select name="snmpParm" size="1">
                     <option>ifAlias</option>
                     <option>ifName</option>
@@ -36,31 +36,31 @@
                 </select>:
                 <input type="hidden" name="listInterfaces" value="false"/>
                 <input type="text" name="snmpParmValue" />
-                <input type="submit" value="Search"/></div>
+                <input type="submit" value="Search"/></p>
         </form>
 
         <form action="#/element/nodelist" method="get">
-            <div class="right">Providing service:
+            <p class="right">Providing service:
                 <input type="hidden" name="listInterfaces" value="false"/>
                 <select name="service" size="1">
                     <option value="{{service.value}}" ng-repeat="service in services">{{service.name}}</option>
                 </select>
-                <input type="submit" value="Search"/></div>
+                <input type="submit" value="Search"/></p>
         </form>
 
         <form action="#/element/nodelist" method="get">
-            <div class="right">MAC Address like:
+            <p class="right">MAC Address like:
                 <input type="hidden" name="listInterfaces" value="false"/>
                 <input type="text" name="maclike" />
-                <input type="submit" value="Search"/></div>
+                <input type="submit" value="Search"/></p>
         </form>
 
         <form action="#/element/nodelist" method="get">
-            <div class="right">Foreign Source name like:
+            <p class="right">Foreign Source name like:
                 <input type="hidden" name="listInterfaces" value="false"/>
                 <input type="text" name="foreignSource"/>
                 <input type="submit" value="Search"/>
-            </div>
+            </p>
         </form>
 
         <ul class="plain">
@@ -73,22 +73,22 @@
     <div class="boxWrapper">
         <!-- category -->
         <form action="#/asset/nodelist" method="get">
-            <div class="right">Category:
+            <p class="right">Category:
                 <input type="hidden" name="column" value="category" />
                 <select name="searchvalue" size="1">
                     <option ng-repeat="cat in asset.categories">{{cat}}</option>
                 </select>
                 <input type="submit" value="Search" />
-                </div>
+                </p>
         </form>
 
         <form action="#/asset/nodelist" method="get">
-            <div class="right">Field:
+            <p class="right">Field:
                 <select name="column" size="1">
                     <option ng-repeat="field in asset.fields" value="{{field.value}}">{{field.name}}</option>
                 </select><br />
                 Containing text: <input type="text" name="searchvalue" />
-                <input type="submit" value="Search" /></div>
+                <input type="submit" value="Search" /></p>
         </form>
         <ul class="plain">
             <li><a href="#/asset/nodelist?column=_allNonEmpty">All nodes with asset info</a></li>

@@ -11,6 +11,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="css/app.css"/>
         <link rel="stylesheet" href="bower_components/angular-ui/build/angular-ui.css"/>
+        <link rel="stylesheet" href="bower_components/ng-table/ng-table.css"/>
         <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
     </head>
     <body ng-controller="onmsController">
@@ -50,34 +51,27 @@
             <div class="spacer"><!-- --></div>
         </div>
         <div id="content">
-            <div class="onms">
+            <div class="onms" ng-controller="BreadcrumbsController">
                 <h2>
                     <a href="index.html">Home</a>
-                    <span ng-if="page.nonavbar && user.loggedin && page.nobreadcrumbs">
-                        <div ng-repeat="breadcrumb in breadcrumbs">
-                            / <a href="{{breadcrumb.url}}">{{breadcrumb.name}}</a>
-                        </div>
-
+                    <span ng-if="!page.nonavbar && user.loggedin && !page.nobreadcrumbs">
+                        <a class="bc-item" ng-repeat="breadcrumb in breadcrumbs" ng-href="{{breadcrumb.url}}">{{breadcrumb.name}}</a>
                     </span>
                 </h2>
             </div>
-
             <ul class="menu">
                 <li><a href="#/view1">view1</a></li>
                 <li><a href="#/view2">view2</a></li>
+                <li><a href="#/node">Nodes</a></li>
                 <li><a href="#/outages">Outages</a></li>
                 <li><a href="#/pathOutages">Path Outages</a></li>
             </ul>
-
             <!--[if lt IE 7]>
                 <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
             <![endif]-->
-
             <div ui-view></div>
-
         </div>
         <div id="prefooter"></div>
-
         <div id="footer">
             <p>
                 OpenNMS <a href="support/about.jsp">Copyright</a> &copy; 2002-2014
@@ -91,8 +85,10 @@
         <script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
         -->
         <script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/angular-resource/angular-resource.js"></script>
         <script src="bower_components/angular-ui/build/angular-ui.js"></script>
         <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+        <script src="bower_components/ng-table/ng-table.js"></script>
         <script src="js/app.js"></script>
         <script src="js/services.js"></script>
         <script src="js/controllers.js"></script>

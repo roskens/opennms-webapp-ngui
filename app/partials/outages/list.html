@@ -1,0 +1,131 @@
+<!-- %!
+    //useful constant strings
+    public static final String ZOOM_IN_ICON = "<i class=\"fa fa-plus-square-o\"></i>";
+    public static final String DISCARD_ICON = "<i class=\"fa fa-minus-square-o\"></i>";
+    public static final String BEFORE_ICON  = "<i class=\"fa fa-toggle-right\"></i>";
+    public static final String AFTER_ICON   = "<i class=\"fa fa-toggle-left\"></i>";
+    
+    public static final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+% -->
+
+
+<!-- jsp:include page="/includes/header.jsp" flush="false" >
+  <jsp:param name="title" value="Outage List" />
+  <jsp:param name="headTitle" value="List" />
+  <jsp:param name="headTitle" value="Outage" />
+  <jsp:param name="breadcrumb" value="<a href='outage/index.jsp' title='Outages System Page'>Outages</a>" />
+  <jsp:param name="breadcrumb" value="List" />
+</jsp:include -->
+
+<!--
+    <% if( outageCount > 0 ) { %>
+      <% String baseUrl = OutageUtil.makeLink(request, parms); %>
+      <jsp:include page="/includes/resultsIndex.jsp" flush="false" >
+        <jsp:param name="count"    value="<%=outageCount%>" />
+        <jsp:param name="baseurl"  value="<%=baseUrl%>" />
+        <jsp:param name="limit"    value="<%=parms.limit%>" />
+        <jsp:param name="multiple" value="<%=parms.multiple%>" />
+      </jsp:include>
+    <% } %>           
+    <jsp:include page="/includes/search-constraints-box.jsp" />
+-->
+<div ng-controller="OutagesController">
+    <button ng-click="tableParams.sorting({})" class="btn btn-default pull-right">Clear sorting</button>
+    <button ng-click="tableParams.filter({})" class="btn btn-default pull-right">Clear filter</button>
+    <p><strong>Sorting:</strong> {{tableParams.sorting() | json}}
+    <p><strong>Filter:</strong> {{tableParams.filter() | json}} 
+    <table ng-table="tableParams" class="table">
+        <tr ng-class="getStatusColor(outage)" ng-repeat="outage in $data">
+            <!-- outage id -->
+            <td data-title="'ID'" sortable="'id'" filter="{ 'id': 'text' }">
+                <a href="#/outages/{{outage.id}}">{{outage.id}}</a>
+            </td>
+
+            <!-- foreign source -->
+            <td class="noWrap" data-title="'ForeignSource'" sortable="'node.foreignSource'" filter="{ 'node.foreignSource': 'text' }">
+                <span ui-if="outage.node.foreignSource">
+                    <a ng-href="#/node/{{outage.node.foreignSource}}">{{outage.node.foreignSource}}</a>
+                </span>
+            </td>
+
+            <!-- node -->
+            <td class="noWrap" data-title="'Node'" sortable="'serviceLostEvent.nodeLabel'" filter="{ 'serviceLostEvent.nodeLabel': 'text' }">
+                <span ui-if="outage.nodeId">
+                    <a ng-href="#/node/{{outage.nodeId}}" title="{{outage.serviceLostEvent.nodeLabel}}">{{outage.serviceLostEvent.nodeLabel}}</a>
+                </span>
+            </td>
+
+            <!-- interface -->
+            <td class="noWrap" data-title="'Interface'" sortable="'ipAddress'" filter="{ 'ipAddress': 'text' }">
+                <span ui-if="outage.ipAddress">
+                    <a ui-if="outage.nodeId" ng-href="#/node/{{outage.nodeId}}/interface/{{outage.ipAddress}}" title="More info on this interface">{{outage.ipAddress}}</a>
+                    <ui-if="!outage.nodeId">{{outage.ipAddress}}</ui-if>
+                </span>
+            </td>
+
+            <!-- service -->
+            <td class="noWrap" data-title="'Service'" sortable="'serviceId'" filter="{ 'serviceId': 'text' }">
+                <span ui-if="outage.serviceId">
+                    <a ui-if="outage.nodeId && outage.ipAddress" ng-href="#/node/{{outage.nodeId}}/interface/{{outage.ipAddress}}/service/{{outage.serviceId}}" title="More info on this service">{{outage.monitoredService.serviceName}}</a>
+                    <ui-if="!outage.nodeId && !outage.ipAddress">{{outage.monitoredService.serviceName}}</ui-if>
+                </span>
+            </td>
+
+            <!-- lost service time -->
+            <td class="noWrap" data-title="'Down'" sortable="'ifLostService'" filter="{ 'ifLostService': 'text' }">
+                {{outage.ifLostService| date }}
+            </td>
+
+            <!-- regained service time -->
+            <td class="noWrap" data-title="'Up'" sortable="'ifRegainedService'" filter="{ 'ifRegainedService': 'text' }">
+                <span ui-if="outage.ifRegainedService">{{outage.ifRegainedService| date }}</span>
+                <span ui-if="!outage.ifRegainedService">{{getStatusLabel(outage)}}</span>
+            </td>
+        </tr>
+    </table>
+</div>
+<!-- % if( outageCount > 0 ) { %>
+  <% String baseUrl = OutageUtil.makeLink(request, parms); %>
+  <jsp:include page="/includes/resultsIndex.jsp" flush="false" >
+    <jsp:param name="count"    value="<%=outageCount%>" />
+    <jsp:param name="baseurl"  value="<%=baseUrl%>" />
+    <jsp:param name="limit"    value="<%=parms.limit%>" />
+    <jsp:param name="multiple" value="<%=parms.multiple%>" />
+  </jsp:include>
+<% } % -->           
+
+<!-- jsp:include page="/includes/bookmark.jsp" flush="false" / -->
+
+<!--
+    protected String makeSortLink(HttpServletRequest request, OutageQueryParms parms, SortStyle style, SortStyle revStyle, String sortString, String title ) {
+      StringBuffer buffer = new StringBuffer();
+
+
+      if( parms.sortStyle == style ) {
+          buffer.append( "<img src=\"images/arrowdown.gif\" hspace=\"0\" vspace=\"0\" border=\"0\" alt=\"" );
+          buffer.append( title );
+          buffer.append( " Ascending Sort\"/>" );
+          buffer.append( "&nbsp;<a href=\"" );
+          buffer.append( OutageUtil.makeLink(request, parms, revStyle ));
+          buffer.append( "\" title=\"Reverse the sort\">" );
+      } else if( parms.sortStyle == revStyle ) {
+          buffer.append( "<img src=\"images/arrowup.gif\" hspace=\"0\" vspace=\"0\" border=\"0\" alt=\"" );
+          buffer.append( title );
+          buffer.append( " Descending Sort\"/>" );
+          buffer.append( "&nbsp;<a href=\"" );
+          buffer.append( OutageUtil.makeLink(request, parms, style )); 
+          buffer.append( "\" title=\"Reverse the sort\">" );
+      } else {
+          buffer.append( "<a href=\"" );
+          buffer.append( OutageUtil.makeLink(request, parms, style ));
+          buffer.append( "\" title=\"Sort by " );
+          buffer.append( sortString );
+          buffer.append( "\">" );   
+      }
+
+      buffer.append( title );
+      buffer.append( "</a>" );
+
+      return( buffer.toString() );
+    }  
+% -->
