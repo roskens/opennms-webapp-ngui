@@ -147,89 +147,24 @@ angular.module('opennms.controllers', ['ngTable', 'ngResource'])
             console.log($scope.node);
         }])
     .controller('OutagesController', ['$scope', '$filter', '$http', '$resource', '$timeout', 'ngTableParams', function($scope, $filter, $http, $resource, $timeout, ngTableParams) {
-            var data = [
-                {
-                    id: 0,
-                    'node': {
-                        id: 0,
-                        foreignSource: '',
-                        label: ''
-                    },
-                    ipaddr: '',
-                    serviceName: '',
-                    lostServiceTime: '',
-                    regainedServiceTime: ''
-                },
-                {
-                    id: 1,
-                    node: {
-                        id: 0,
-                        foreignSource: '',
-                        label: ''
-                    },
-                    ipaddr: '',
-                    serviceName: '',
-                    lostServiceTime: '',
-                    regainedServiceTime: ''
-                },
-                {
-                    id: 2,
-                    node: {
-                        id: 0,
-                        foreignSource: '',
-                        label: ''
-                    },
-                    ipaddr: '',
-                    serviceName: '',
-                    lostServiceTime: '',
-                    regainedServiceTime: ''
-                },
-                {
-                    id: 3,
-                    node: {
-                        id: 0,
-                        foreignSource: '',
-                        label: '',
-                    },
-                    ipaddr: '',
-                    serviceName: '',
-                    lostServiceTime: '',
-                    regainedServiceTime: ''
-                },
-                {
-                    id: 4,
-                    node: {
-                        id: 0,
-                        foreignSource: '',
-                        label: ''
-                    },
-                    ipaddr: '',
-                    serviceName: '',
-                    lostServiceTime: '',
-                    regainedServiceTime: ''
-                },
-                {
-                    id: 5,
-                    node: {
-                        id: 0,
-                        foreignSource: '',
-                        label: ''
-                    },
-                    ipaddr: '',
-                    serviceName: '',
-                    lostServiceTime: '',
-                    regainedServiceTime: ''
-                }
-            ];
-            var Api = $resource('/opennms/opennms/rest/outages');
+            var Api = $resource('/opennms/rest/outages');
+            /* Issues:
+             * 1. rest interface does not have sort by node foreign source.
+             * 2. rest interface does not have sort by node.
+             * 3. rest interface does not sort by interface.
+             * 4. rest interface does not sort by service.
+             */
+
             $scope.getStatusColor = function(outage) {
 
             };
 
             $scope.getStatusLabel = function(outage) {
-
+                if (outage.serviceRegainedEvent === null) {
+                    return 'DOWN';
+                }
             };
-            
+
             $scope.getServiceName = function(outage) {
                 return outage.monitoredService.serviceName;
             }
@@ -244,15 +179,31 @@ angular.module('opennms.controllers', ['ngTable', 'ngResource'])
                 }
             }, {
                 counts: [10, 25, 50, 100, 250, 500, 1000, 2000],
-                total: data.length, // length of data
+                total: 0, // length of data
                 getData: function($defer, params) {
                     // use build-in angular filter
-                    
+                    var config = {
+                        limit: params.count(),
+                        offset: (params.page() - 1) * params.count(),
+                        orderBy: 'id',
+                        order: 'desc'
+                    };
+                    console.log('sorting: ', params.sorting());
+                    var keys = Object.keys(params.sorting());
+                    for (var k in params.sorting()) {
+                        if (!params.sorting().hasOwnProperty(k)) {
+                            continue;
+                        }
+                        config.orderBy = k;
+                        config.order = params.sorting()[k];
+                    }
+
                     // limit: count
                     // offset: (page - 1) * count
-                    // comparator:
                     // orderBy:
-                    Api.get({limit:params.count(), offset: (params.page() - 1) * params.count(), orderBy: 'id'}, function(data) {
+                    // order:
+                    // comparator:
+                    Api.get(config, function(data) {
                         $timeout(function() {
                             console.log('outages:', data.outage);
                             var filteredData = params.filter() ?
@@ -263,7 +214,7 @@ angular.module('opennms.controllers', ['ngTable', 'ngResource'])
                                 data.outage;
                             params.total(orderedData.length); // set total for recalc pagination
                             $defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-                        }, 5000);
+                        }, 500);
                     });
                 }
             });

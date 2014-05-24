@@ -34,7 +34,7 @@
     <button ng-click="tableParams.filter({})" class="btn btn-default pull-right">Clear filter</button>
     <p><strong>Sorting:</strong> {{tableParams.sorting() | json}}
     <p><strong>Filter:</strong> {{tableParams.filter() | json}} 
-    <table ng-table="tableParams" class="table">
+    <table ng-table="tableParams" show-filter="true" class="table">
         <tr ng-class="getStatusColor(outage)" ng-repeat="outage in $data">
             <!-- outage id -->
             <td data-title="'ID'" sortable="'id'" filter="{ 'id': 'text' }">
@@ -49,7 +49,7 @@
             </td>
 
             <!-- node -->
-            <td class="noWrap" data-title="'Node'" sortable="'serviceLostEvent.nodeLabel'" filter="{ 'serviceLostEvent.nodeLabel': 'text' }">
+            <td class="noWrap" data-title="'Node'" sortable="'nodeId'" filter="{ 'nodeId': 'text' }">
                 <span ui-if="outage.nodeId">
                     <a ng-href="#/node/{{outage.nodeId}}" title="{{outage.serviceLostEvent.nodeLabel}}">{{outage.serviceLostEvent.nodeLabel}}</a>
                 </span>
@@ -64,7 +64,7 @@
             </td>
 
             <!-- service -->
-            <td class="noWrap" data-title="'Service'" sortable="'serviceId'" filter="{ 'serviceId': 'text' }">
+            <td class="noWrap" data-title="'Service'" sortable="'ifserviceId'" filter="{ 'ifserviceId': 'text' }">
                 <span ui-if="outage.serviceId">
                     <a ui-if="outage.nodeId && outage.ipAddress" ng-href="#/node/{{outage.nodeId}}/interface/{{outage.ipAddress}}/service/{{outage.serviceId}}" title="More info on this service">{{outage.monitoredService.serviceName}}</a>
                     <ui-if="!outage.nodeId && !outage.ipAddress">{{outage.monitoredService.serviceName}}</ui-if>
@@ -73,12 +73,12 @@
 
             <!-- lost service time -->
             <td class="noWrap" data-title="'Down'" sortable="'ifLostService'" filter="{ 'ifLostService': 'text' }">
-                {{outage.ifLostService| date }}
+                {{outage.ifLostService| date:'MM/dd/yy HH:mm:ss' }}
             </td>
 
             <!-- regained service time -->
             <td class="noWrap" data-title="'Up'" sortable="'ifRegainedService'" filter="{ 'ifRegainedService': 'text' }">
-                <span ui-if="outage.ifRegainedService">{{outage.ifRegainedService| date }}</span>
+                <span ui-if="outage.ifRegainedService">{{outage.ifRegainedService| date:'MM/dd/yy HH:mm:ss' }}</span>
                 <span ui-if="!outage.ifRegainedService">{{getStatusLabel(outage)}}</span>
             </td>
         </tr>
