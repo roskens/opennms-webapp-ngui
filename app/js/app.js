@@ -6,6 +6,7 @@ angular.module('opennms', [
     'ui',
     'ui.router',
     'ui.bootstrap',
+    'ngQuickDate',
     'opennms.filters',
     'opennms.services',
     'opennms.directives',
@@ -119,9 +120,7 @@ angular.module('opennms', [
             .state('events', {
                 abstract: true,
                 url: '/events',
-                templateUrl: 'partials/events/index.html',
-                // controller: 'EventsController',
-                title: 'Events'
+                template: '<ui-view/>'
             })
             .state('events.default', {
                 url: '',
@@ -138,7 +137,7 @@ angular.module('opennms', [
             .state('events.search', {
                 url: '/search',
                 templateUrl: 'partials/events/search.html',
-                // controller: 'EventsController',
+                controller: 'EventSearchController',
                 title: 'Events Search'
             })
             .state('events.event', {
@@ -147,6 +146,12 @@ angular.module('opennms', [
                 controller: 'EventDetailController',
                 title: 'Event Details'
             });
+    })
+    .config(function(ngQuickDateDefaultsProvider) {
+        ngQuickDateDefaultsProvider.set('parseDateFunction', function(str) {
+            d = Date.create(str);
+            return d.isValid() ? d : null;
+        });
     })
     .config(['$provide', function($provide) {
             $provide.decorator('$rootScope', function($delegate) {

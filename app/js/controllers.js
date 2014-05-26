@@ -259,18 +259,18 @@ angular.module('opennms.controllers', ['ngResource'])
             };
             $scope.search();
         }])
-    .controller('OutageDetailController', ['$scope', '$filter', '$resource', '$timeout', function($scope, $filter, $resource, $timeout) {
+    .controller('OutageDetailController', ['$scope', '$filter', '$resource', '$timeout', '$state', '$stateParams', function($scope, $filter, $resource, $timeout, $state, $stateParams) {
             /* Issues:
              * 1. rest interface does not have sort by node foreign source.
              * 2. rest interface does not have sort by node.
              * 3. rest interface does not sort by interface.
              * 4. rest interface does not sort by service.
              */
-            var Api = $resource('/opennms/rest/outages/:outageId', {outageId:'@id'});
+            var Api = $resource('/opennms/rest/outages/:outageId', {outageId: '@id'});
             // use build-in angular filter
             var config = {
-                id: 1,
-                limit: 0
+                id: $stateParams.id,
+                limit: 1
             };
             // limit: count
             // offset: (page - 1) * count
@@ -300,19 +300,17 @@ angular.module('opennms.controllers', ['ngResource'])
         }])
     .controller('EventsController', ['$scope', '$filter', '$resource', '$timeout', function($scope, $filter, $resource, $timeout) {
             $scope.favorites = [];
-        
+
         }])
     .controller('EventListController', ['$scope', '$filter', '$resource', '$timeout', function($scope, $filter, $resource, $timeout) {
             /* Issues:
-             * 1. rest interface does not have sort by node foreign source.
-             * 2. rest interface does not have sort by node.
-             * 3. rest interface does not sort by interface.
-             * 4. rest interface does not sort by service.
+             * 1. rest interface does not incude nodeId.
+             * 2. rest interface does not include serviceName/serviceId
              */
             var Api = $resource('/opennms/rest/events');
             // use build-in angular filter
             var config = {
-                limit: 10
+                limit: 25
             };
             $scope.sort = {
                 sortingOrder: 'id',
@@ -321,10 +319,10 @@ angular.module('opennms.controllers', ['ngResource'])
             $scope.gap = 5;
             $scope.filteredItems = [];
             $scope.groupedItems = [];
-            $scope.itemsPerPage = 10;
+            $scope.itemsPerPage = 25;
             $scope.pagedItems = [];
             $scope.currentPage = 0;
-            $scope.items = [];
+            $scope.events = [];
             // limit: count
             // offset: (page - 1) * count
             // orderBy:
@@ -332,8 +330,9 @@ angular.module('opennms.controllers', ['ngResource'])
             // comparator:
             Api.get(config, function(data) {
                 $timeout(function() {
-                    console.log('outages:', data.outage);
-                    $scope.items = data.outage;
+                    console.log('events:', data);
+                    $scope.events = data.event;
+                    $scope.totalCount = data.totalCount;
                     $scope.search();
                 }, 500);
             });
@@ -345,7 +344,7 @@ angular.module('opennms.controllers', ['ngResource'])
             };
             // init the filtered items
             $scope.search = function() {
-                $scope.filteredItems = $filter('filter')($scope.items, function(item) {
+                $scope.filteredItems = $filter('filter')($scope.events, function(item) {
                     for (var attr in item) {
                         if (searchMatch(item[attr], $scope.query))
                             return true;
@@ -408,25 +407,32 @@ angular.module('opennms.controllers', ['ngResource'])
             $scope.setPage = function() {
                 $scope.currentPage = this.n;
             };
-            $scope.getStatusLabel = function(outage) {
-                if (outage.serviceRegainedEvent === null) {
-                    return 'DOWN';
+            function capitaliseFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+            $scope.getLabel = function(event) {
+                if (event.severity !== null) {
+                    return capitaliseFirstLetter(event.severity);
                 }
+                return '';
             };
+            $scope.getShortName = function(label) {
+                if (label.length > 32) {
+                    return label.substring(0, 31) + '...';
+                }
+                return label;
+            };
+
             $scope.search();
         }])
-    .controller('EventDetailController', ['$scope', '$filter', '$resource', '$timeout', function($scope, $filter, $resource, $timeout) {
+    .controller('EventDetailController', ['$scope', '$filter', '$resource', '$timeout', '$state', '$stateParams', '$sce', function($scope, $filter, $resource, $timeout, $state, $stateParams, $sce) {
             /* Issues:
-             * 1. rest interface does not have sort by node foreign source.
-             * 2. rest interface does not have sort by node.
-             * 3. rest interface does not sort by interface.
-             * 4. rest interface does not sort by service.
+             * 1. rest interface does not include nodeId on the event.
              */
-            var Api = $resource('/opennms/rest/events/:eventId', {eventId:'@id'});
+            var Api = $resource('/opennms/rest/events/:eventId', {eventId: '@id'});
             // use build-in angular filter
             var config = {
-                id: 1,
-                limit: 0
+                id: $stateParams.id
             };
             // limit: count
             // offset: (page - 1) * count
@@ -435,18 +441,44 @@ angular.module('opennms.controllers', ['ngResource'])
             // comparator:
             Api.get(config, function(data) {
                 $timeout(function() {
-                    console.log('data:', data);
-                    $scope.outage = data.outage[0];
+                    console.log('event:', data);
+                    $scope.event = data.event[0];
+                    // trust the original event description.
+                    $scope.event.description = $sce.trustAsHtml($scope.event.description);
+                    if (data.event[0].hasOwnProperty('operinstruct')) {
+                        $scope.event.operinstruct = $sce.trustAsHtml($scope.event.operinstruct);
+                    } else {
+                        $scope.event.operinstruct = null;
+                    }
                 }, 500);
             });
-            $scope.getStatusLabel = function(outage) {
-                if (outage.serviceRegainedEvent === null) {
-                    return 'DOWN';
+            function capitaliseFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+            $scope.getLabel = function(event) {
+                if (event.severity !== null) {
+                    return capitaliseFirstLetter(event.severity.toLowerCase());
                 }
+                return '';
             };
+            $scope.hasLocationMonitor = function(event) {
+                // parms.containsKey(EventConstants.PARM_LOCATION_MONITOR_ID)
+                return false;
+            };
+            $scope.afterDateTime = Date.create("now");
+            $scope.beforeDateTime = Date.create("now");
         }])
-    .controller('EventsSearchController', ['$scope', '$stateParams', function($scope, $stateParams) {
-
+    .controller('EventSearchController', ['$scope', '$stateParams', function($scope, $stateParams) {
+            $scope.severities = [
+                {id: 1, label: 'Indeterminate'},
+                {id: 2, label: 'Cleared'},
+                {id: 3, label: 'Normal'},
+                {id: 4, label: 'Warning'},
+                {id: 5, label: 'Minor'},
+                {id: 6, label: 'Major'},
+                {id: 7, label: 'Critical'}
+            ];
+            $scope.services = [];
         }])
     .controller('AlarmsController', ['$scope', function($scope) {
 

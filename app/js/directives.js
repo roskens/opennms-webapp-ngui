@@ -57,7 +57,7 @@ angular.module('opennms.directives', [])
             template:
                 ' <a ng-click="sort_by(order)" style="color: #555555;">' +
                 '    <span ng-transclude></span>' +
-                '    <i ng-class="selectedCls(order)"></i><i ng-class="fa fa-filter"></i>' +
+                '    <i ng-class="selectedCls(order)"></i><i class="fa" ng-class="fa-filter"></i>' +
                 '</a>',
             link: function(scope) {
 

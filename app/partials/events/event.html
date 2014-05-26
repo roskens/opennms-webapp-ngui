@@ -1,68 +1,98 @@
 <!-- jsp:include page="/includes/header.jsp" flush="false" >
-  <jsp:param name="title" value="Outage Details" />
+  <jsp:param name="title" value="Event Detail" />
   <jsp:param name="headTitle" value="Detail" />
-  <jsp:param name="headTitle" value="Outages" />
-  <jsp:param name="breadcrumb" value="<a href='outage/list'>Outages</a>" />
-  <jsp:param name="breadcrumb" value="Detail " />
+  <jsp:param name="headTtitle" value="Events" />
+  <jsp:param name="breadcrumb" value="<a href='events/index'>Events</a>" />
+  <jsp:param name="breadcrumb" value="Detail" />
 </jsp:include -->
-<div ng-controller="OutageDetailController">
-    <!-- page title -->
-    <h3>Outage: {{outage.id}}</h3>
+<div ng-controller="EventDetailController">
+    <div ng-if="event === null">
+        <h3>Event Not Found in Database</h3>
+    </div>
+    <div ng-if="event !== null">
+        <h3>Event {{event.id}}</h3>
 
-    <table class="standardfirst">
-        <tr>
-            <td class="standardheader" width="10%">Node:</td>
-            <td class="standard">
-                <a ng-hide="outage.nodeId" ng-href="#/node/{{outage.nodeId}}">{{outage.nodeLabel}}</a>
-            </td>
+        <table>
+            <tr ng-class="getLabel(event)">
+                <th class="divider" width="100em">Severity</th>
+                <td class="divider" width="28%">{{getLabel(event)}}</td>
+                <th class="divider" width="100em">Node</th>
+                <td class="divider" width="28%">
+                    <a ng-if="event.nodeLabel" ng-href="#/node/{{event.nodeId}}">{{event.nodeLabel}}</a>
+                </td>
+                <td class="divider" colspan="2">&nbsp;</td>
+            </tr>
 
-            <td class="standardheader" width="10%">Lost&nbsp;Service&nbsp;Time:</td>
-            <td class="standard noWrap">{{outage.ifLostService| date:'MM/dd/yy h:mm:ss a'}}</td>
+            <tr ng-class="getLabel(event)">
+                <th>Time</th>
+                <td>{{event.time| date:'MM/dd/yy HH:mm:ss'}}</td>
+                <th>Interface</th>
+                <td>
+                    <span ng-if="event.ipAddress !== null">
+                        <a ng-if="event.nodeId > 0" ng-href="#/node/{{event.nodeId}}/interface/{{event.ipAddress}}">{{event.ipAddress}}</a>
+                        <span ng-if="event.nodeId == 0">{{event.ipAddress}}</span>
+                    </span>
+                    <span ng-if="event.ipAddress === null">
+                        &nbsp;
+                    </span>
+                </td>
+                <td colspan="2">&nbsp;</td>
+            </tr>
 
-            <td class="standardheader" width="10%">Lost&nbsp;Service&nbsp;Event:</td>
-            <td class="standard"><a ng-href="#/event/{{outage.serviceLostEvent.id}}">{{outage.serviceLostEvent.id}}</a></td>          
+            <tr ng-class="getLabel(event)">
+                <th>Service</th>
+                <td>
+                    <span ng-if="event.serviceName">
+                        <a ng-if="event.nodeId > 0" ng-href="#/node/{{event.nodeId}}/interface/{{event.ipAddress}}/service/{{event.serviceName}}">{{event.serviceName}}</a>
+                        <span ng-if="event.nodeId == 0">{{event.serviceName}}</span>
+                    </span>
+                    <span ng-if="event.serviceName === null">
+                        &nbsp;
+                    </span>
+                </td>
+                <th ng-if="hasLocationMonitor(event)">Location&nbsp;Monitor&nbsp;ID</th>
+                <td ng-if="hasLocationMonitor(event)"><a href="distributed/locationMonitorDetails.htm?monitorId=<%= parms.get(EventConstants.PARM_LOCATION_MONITOR_ID)%>"><%= parms.get(EventConstants.PARM_LOCATION_MONITOR_ID) %></a></td>
+                <td ng-if="hasLocationMonitor(event)" colspan="2">&nbsp;</td>
+                <td ng-if="!hasLocationMonitor(event)" colspan="4">&nbsp;</td>
+            </tr>
 
-        </tr>
-        <tr>
-            <td class="standardheader">Interface:</td>
-            <td class="standard">
-                <span ui-if="outage.ipAddress !== null">
-                    <a ui-if="outage.nodeId > 0" ng-href="#/node/{{outage.nodeId}}/interface/{{outage.ipAddress}}">{{outage.ipAddress}}</a>
-                    <span ui-if="outage.nodeId == 0">{{outage.ipAddress}}</span>
-                </span>
-                <span ui-if="outage.ipAddress === null">
-                    &nbsp;
-                </span>
-            </td>
+            <tr ng-class="getLabel(event)">
+                <th>UEI</th>
+                <td>
+                    <span ng-if="event.uei !== null">{{event.uei}}</span>
+                </td>
+                <td colspan="4">&nbsp;</td>
+            </tr>
+        </table>
 
-            <td class="standardheader">Regained&nbsp;Service:</td>
-            <td class="standard">
-                <span ui-if="outage.ifRegainedService !== null">
-                    {{outage.ifRegainedService| date:'MM/dd/yy HH:mm:ss' }}
-                </span>
-                <span ui-if="outage.ifRegainedService === null">{{getStatusLabel(outage)}}</span>
-            </td>
+        <table>
+            <tr ng-class="getLabel(event)">
+                <th>Log&nbsp;Message</th>
+            </tr>
+            <tr ng-class="getLabel(event)">
+                <td>{{event.logMessage}}</td>
+            </tr>
+        </table>
 
-            <td class="standardheader">Regained&nbsp;Service&nbsp;Event:</td>
-            <td class="standard">
-                <span ui-if="outage.serviceRegainedEvent !== null">
-                    <a ng-href="#/event/{{outage.serviceRegainedEvent.id}}">{{outage.serviceRegainedEvent.id}}</a>
-                </span>
-                <span ui-if="!outage.ifRegainedService">{{outage.serviceRegainedEvent.id}}</span>
-            </td>          
+        <table>
+            <tr ng-class="getLabel(event)">
+                <th>Description</th>
+            </tr>
+            <tr ng-class="getLabel(event)">
+                <td><span ng-bind-html="event.description"></span></td>
+            </tr>
+        </table>
 
-        </tr>
-        <tr>
-            <td class="standardheader">Service:</td>
-            <td class="standard">
-
-                <span ui-if="outage.serviceId > 0">
-                    <a ui-if="outage.nodeId !== null && outage.ipAddress !== null" ng-href="#/node/{{outage.nodeId}}/interface/{{outage.ipAddress}}/service/{{outage.serviceId}}" title="More info on this service">{{outage.monitoredService.serviceName}}</a>
-                    <span ui-if="!(outage.nodeId !== null && outage.ipAddress !== null)">{{outage.monitoredService.serviceName}}</span>
-                </span>
-
-            </td>
-            <td class="standard" colspan="4">&nbsp;</td>
-        </tr>
-    </table>
+        <table>
+            <tr ng-class="getLabel(event)">
+                <th>Operator&nbsp;Instructions</th>
+            </tr>
+            <tr ng-class="getLabel(event)">
+                <td>
+                    <span ng-if="event.operinstruct === null">No instructions available</span>
+                    <span ng-if="event.operinstruct !== null">{{event.operinstruct}}</span>
+                </td>
+            </tr>
+        </table>
+    </div>
 </div>
