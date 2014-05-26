@@ -2,7 +2,7 @@
 
 /* Controllers */
 
-angular.module('opennms.controllers', ['ngTable', 'ngResource'])
+angular.module('opennms.controllers', ['ngResource'])
     .factory('navLinkFactory', function($http) {
         var links = [
             {'name': 'Node List', 'url': '#/node/list', 'display': true},
@@ -146,82 +146,148 @@ angular.module('opennms.controllers', ['ngTable', 'ngResource'])
             ;
             console.log($scope.node);
         }])
-    .controller('OutagesController', ['$scope', '$filter', '$http', '$resource', '$timeout', 'ngTableParams', function($scope, $filter, $http, $resource, $timeout, ngTableParams) {
-            var Api = $resource('/opennms/rest/outages');
+    .controller('OutagesController', ['$scope', '$filter', '$resource', '$timeout', function($scope, $filter, $resource, $timeout) {
             /* Issues:
              * 1. rest interface does not have sort by node foreign source.
              * 2. rest interface does not have sort by node.
              * 3. rest interface does not sort by interface.
              * 4. rest interface does not sort by service.
              */
-
-            $scope.getStatusColor = function(outage) {
-
+            var Api = $resource('/opennms/rest/outages');
+            // use build-in angular filter
+            var config = {
+                limit: 0
             };
+            $scope.sort = {
+                sortingOrder: 'id',
+                reverse: false
+            };
+            $scope.gap = 5;
+            $scope.filteredItems = [];
+            $scope.groupedItems = [];
+            $scope.itemsPerPage = 10;
+            $scope.pagedItems = [];
+            $scope.currentPage = 0;
+            $scope.items = [];
+            // limit: count
+            // offset: (page - 1) * count
+            // orderBy:
+            // order:
+            // comparator:
+            Api.get(config, function(data) {
+                $timeout(function() {
+                    console.log('outages:', data.outage);
+                    $scope.items = data.outage;
+                    $scope.search();
+                }, 500);
+            });
+            var searchMatch = function(haystack, needle) {
+                if (!needle) {
+                    return true;
+                }
+                return haystack.toLowerCase().indexOf(needle.toLowerCase()) !== -1;
+            };
+            // init the filtered items
+            $scope.search = function() {
+                $scope.filteredItems = $filter('filter')($scope.items, function(item) {
+                    for (var attr in item) {
+                        if (searchMatch(item[attr], $scope.query))
+                            return true;
+                    }
+                    return false;
+                });
+                // take care of the sorting order
+                if ($scope.sort.sortingOrder !== '') {
+                    $scope.filteredItems = $filter('orderBy')($scope.filteredItems, $scope.sort.sortingOrder, $scope.sort.reverse);
+                }
+                $scope.currentPage = 0;
+                // now group by pages
+                $scope.groupToPages();
+            };
+            // calculate page in place
+            $scope.groupToPages = function() {
+                $scope.pagedItems = [];
+                for (var i = 0; i < $scope.filteredItems.length; i++) {
+                    if (i % $scope.itemsPerPage === 0) {
+                        $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)] = [$scope.filteredItems[i]];
+                    } else {
+                        $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)].push($scope.filteredItems[i]);
+                    }
+                }
+            };
+            $scope.range = function(size, start, end) {
+                var ret = [];
+                //console.log(size, start, end);
 
+                if (size < end) {
+                    end = size;
+                    start = size - $scope.gap;
+                }
+                for (var i = start; i < end; i++) {
+                    ret.push(i);
+                }
+                //console.log(ret);
+                return ret;
+            };
+            $scope.firstPage = function() {
+                if ($scope.currentPage > 0) {
+                    $scope.currentPage = 0;
+                }
+            };
+            $scope.lastPage = function() {
+                if ($scope.currentPage < $scope.pagedItems.length - 1) {
+                    $scope.currentPage = $scope.pagedItems.length - 1;
+                }
+            };
+            $scope.prevPage = function() {
+                if ($scope.currentPage > 0) {
+                    $scope.currentPage--;
+                }
+            };
+            $scope.nextPage = function() {
+                if ($scope.currentPage < $scope.pagedItems.length - 1) {
+                    $scope.currentPage++;
+                }
+            };
+            $scope.setPage = function() {
+                $scope.currentPage = this.n;
+            };
             $scope.getStatusLabel = function(outage) {
                 if (outage.serviceRegainedEvent === null) {
                     return 'DOWN';
                 }
             };
-
-            $scope.getServiceName = function(outage) {
-                return outage.monitoredService.serviceName;
-            }
-
-            $scope.tableParams = new ngTableParams({
-                page: 1, // show first page
-                count: 10, // count per page
-                filter: {
-                },
-                sorting: {
-                    id: 'desc'     // initial sorting
-                }
-            }, {
-                counts: [10, 25, 50, 100, 250, 500, 1000, 2000],
-                total: 0, // length of data
-                getData: function($defer, params) {
-                    // use build-in angular filter
-                    var config = {
-                        limit: params.count(),
-                        offset: (params.page() - 1) * params.count(),
-                        orderBy: 'id',
-                        order: 'desc'
-                    };
-                    console.log('sorting: ', params.sorting());
-                    var keys = Object.keys(params.sorting());
-                    for (var k in params.sorting()) {
-                        if (!params.sorting().hasOwnProperty(k)) {
-                            continue;
-                        }
-                        config.orderBy = k;
-                        config.order = params.sorting()[k];
-                    }
-
-                    // limit: count
-                    // offset: (page - 1) * count
-                    // orderBy:
-                    // order:
-                    // comparator:
-                    Api.get(config, function(data) {
-                        $timeout(function() {
-                            console.log('outages:', data.outage);
-                            var filteredData = params.filter() ?
-                                $filter('filter')(data.outage, params.filter()) :
-                                data.outage;
-                            var orderedData = params.sorting() ?
-                                $filter('orderBy')(filteredData, params.orderBy()) :
-                                data.outage;
-                            params.total(orderedData.length); // set total for recalc pagination
-                            $defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-                        }, 500);
-                    });
-                }
-            });
-
+            $scope.search();
         }])
-    .controller('OutageDetailController', ['$scope', '$stateParams', function($scope, $stateParams) {
-
+    .controller('OutageDetailController', ['$scope', '$filter', '$resource', '$timeout', function($scope, $filter, $resource, $timeout) {
+            /* Issues:
+             * 1. rest interface does not have sort by node foreign source.
+             * 2. rest interface does not have sort by node.
+             * 3. rest interface does not sort by interface.
+             * 4. rest interface does not sort by service.
+             */
+            var Api = $resource('/opennms/rest/outages/:outageId', {outageId:'@id'});
+            // use build-in angular filter
+            var config = {
+                id: 1,
+                limit: 0
+            };
+            // limit: count
+            // offset: (page - 1) * count
+            // orderBy:
+            // order:
+            // comparator:
+            Api.get(config, function(data) {
+                $timeout(function() {
+                    console.log('data:', data);
+                    $scope.outage = data.outage[0];
+                }, 500);
+            });
+            $scope.getStatusLabel = function(outage) {
+                if (outage.serviceRegainedEvent === null) {
+                    return 'DOWN';
+                }
+            };
         }])
     .controller('OutagesSearchController', ['$scope', '$stateParams', function($scope, $stateParams) {
 
@@ -232,7 +298,154 @@ angular.module('opennms.controllers', ['ngTable', 'ngResource'])
     .controller('DashboardController', ['$scope', function($scope) {
 
         }])
-    .controller('EventsController', ['$scope', function($scope) {
+    .controller('EventsController', ['$scope', '$filter', '$resource', '$timeout', function($scope, $filter, $resource, $timeout) {
+            $scope.favorites = [];
+        
+        }])
+    .controller('EventListController', ['$scope', '$filter', '$resource', '$timeout', function($scope, $filter, $resource, $timeout) {
+            /* Issues:
+             * 1. rest interface does not have sort by node foreign source.
+             * 2. rest interface does not have sort by node.
+             * 3. rest interface does not sort by interface.
+             * 4. rest interface does not sort by service.
+             */
+            var Api = $resource('/opennms/rest/events');
+            // use build-in angular filter
+            var config = {
+                limit: 10
+            };
+            $scope.sort = {
+                sortingOrder: 'id',
+                reverse: false
+            };
+            $scope.gap = 5;
+            $scope.filteredItems = [];
+            $scope.groupedItems = [];
+            $scope.itemsPerPage = 10;
+            $scope.pagedItems = [];
+            $scope.currentPage = 0;
+            $scope.items = [];
+            // limit: count
+            // offset: (page - 1) * count
+            // orderBy:
+            // order:
+            // comparator:
+            Api.get(config, function(data) {
+                $timeout(function() {
+                    console.log('outages:', data.outage);
+                    $scope.items = data.outage;
+                    $scope.search();
+                }, 500);
+            });
+            var searchMatch = function(haystack, needle) {
+                if (!needle) {
+                    return true;
+                }
+                return haystack.toLowerCase().indexOf(needle.toLowerCase()) !== -1;
+            };
+            // init the filtered items
+            $scope.search = function() {
+                $scope.filteredItems = $filter('filter')($scope.items, function(item) {
+                    for (var attr in item) {
+                        if (searchMatch(item[attr], $scope.query))
+                            return true;
+                    }
+                    return false;
+                });
+                // take care of the sorting order
+                if ($scope.sort.sortingOrder !== '') {
+                    $scope.filteredItems = $filter('orderBy')($scope.filteredItems, $scope.sort.sortingOrder, $scope.sort.reverse);
+                }
+                $scope.currentPage = 0;
+                // now group by pages
+                $scope.groupToPages();
+            };
+            // calculate page in place
+            $scope.groupToPages = function() {
+                $scope.pagedItems = [];
+                for (var i = 0; i < $scope.filteredItems.length; i++) {
+                    if (i % $scope.itemsPerPage === 0) {
+                        $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)] = [$scope.filteredItems[i]];
+                    } else {
+                        $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)].push($scope.filteredItems[i]);
+                    }
+                }
+            };
+            $scope.range = function(size, start, end) {
+                var ret = [];
+                //console.log(size, start, end);
+
+                if (size < end) {
+                    end = size;
+                    start = size - $scope.gap;
+                }
+                for (var i = start; i < end; i++) {
+                    ret.push(i);
+                }
+                //console.log(ret);
+                return ret;
+            };
+            $scope.firstPage = function() {
+                if ($scope.currentPage > 0) {
+                    $scope.currentPage = 0;
+                }
+            };
+            $scope.lastPage = function() {
+                if ($scope.currentPage < $scope.pagedItems.length - 1) {
+                    $scope.currentPage = $scope.pagedItems.length - 1;
+                }
+            };
+            $scope.prevPage = function() {
+                if ($scope.currentPage > 0) {
+                    $scope.currentPage--;
+                }
+            };
+            $scope.nextPage = function() {
+                if ($scope.currentPage < $scope.pagedItems.length - 1) {
+                    $scope.currentPage++;
+                }
+            };
+            $scope.setPage = function() {
+                $scope.currentPage = this.n;
+            };
+            $scope.getStatusLabel = function(outage) {
+                if (outage.serviceRegainedEvent === null) {
+                    return 'DOWN';
+                }
+            };
+            $scope.search();
+        }])
+    .controller('EventDetailController', ['$scope', '$filter', '$resource', '$timeout', function($scope, $filter, $resource, $timeout) {
+            /* Issues:
+             * 1. rest interface does not have sort by node foreign source.
+             * 2. rest interface does not have sort by node.
+             * 3. rest interface does not sort by interface.
+             * 4. rest interface does not sort by service.
+             */
+            var Api = $resource('/opennms/rest/events/:eventId', {eventId:'@id'});
+            // use build-in angular filter
+            var config = {
+                id: 1,
+                limit: 0
+            };
+            // limit: count
+            // offset: (page - 1) * count
+            // orderBy:
+            // order:
+            // comparator:
+            Api.get(config, function(data) {
+                $timeout(function() {
+                    console.log('data:', data);
+                    $scope.outage = data.outage[0];
+                }, 500);
+            });
+            $scope.getStatusLabel = function(outage) {
+                if (outage.serviceRegainedEvent === null) {
+                    return 'DOWN';
+                }
+            };
+        }])
+    .controller('EventsSearchController', ['$scope', '$stateParams', function($scope, $stateParams) {
 
         }])
     .controller('AlarmsController', ['$scope', function($scope) {
@@ -265,5 +478,4 @@ angular.module('opennms.controllers', ['ngTable', 'ngResource'])
     .controller('SupportController', ['$scope', function($scope) {
 
         }]);
-
 // NavBarController

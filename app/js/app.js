@@ -5,7 +5,7 @@
 angular.module('opennms', [
     'ui',
     'ui.router',
-    'ngTable',
+    'ui.bootstrap',
     'opennms.filters',
     'opennms.services',
     'opennms.directives',
@@ -15,7 +15,7 @@ angular.module('opennms', [
         $urlRouterProvider.otherwise('/home');
         $stateProvider
             .state('home', {
-                url: '/home',
+                url: '/home'
             })
             .state('login', {
                 url: '/login',
@@ -115,6 +115,37 @@ angular.module('opennms', [
                 templateUrl: 'partials/pathOutages.html',
                 controller: 'PathOutagesController',
                 title: 'Path Outages'
+            })
+            .state('events', {
+                abstract: true,
+                url: '/events',
+                templateUrl: 'partials/events/index.html',
+                // controller: 'EventsController',
+                title: 'Events'
+            })
+            .state('events.default', {
+                url: '',
+                templateUrl: 'partials/events/index.html',
+                // controller: 'EventsController',
+                title: 'Events'
+            })
+            .state('events.list', {
+                url: '/list',
+                templateUrl: 'partials/events/list.html',
+                controller: 'EventsController',
+                title: 'Events List'
+            })
+            .state('events.search', {
+                url: '/search',
+                templateUrl: 'partials/events/search.html',
+                // controller: 'EventsController',
+                title: 'Events Search'
+            })
+            .state('events.event', {
+                url: '/:id',
+                templateUrl: 'partials/events/event.html',
+                controller: 'EventDetailController',
+                title: 'Event Details'
             });
     })
     .config(['$provide', function($provide) {

@@ -30,58 +30,81 @@
     <jsp:include page="/includes/search-constraints-box.jsp" />
 -->
 <div ng-controller="OutagesController">
-    <button ng-click="tableParams.sorting({})" class="btn btn-default pull-right">Clear sorting</button>
-    <button ng-click="tableParams.filter({})" class="btn btn-default pull-right">Clear filter</button>
-    <p><strong>Sorting:</strong> {{tableParams.sorting() | json}}
-    <p><strong>Filter:</strong> {{tableParams.filter() | json}} 
-    <table ng-table="tableParams" show-filter="true" class="table">
-        <tr ng-class="getStatusColor(outage)" ng-repeat="outage in $data">
-            <!-- outage id -->
-            <td data-title="'ID'" sortable="'id'" filter="{ 'id': 'text' }">
-                <a href="#/outages/{{outage.id}}">{{outage.id}}</a>
-            </td>
+    <table class="table table-striped table-condensed table-hover">
+        <thead>
+            <tr>
+                <th class="noWrap" custom-sort order="'id'" sort="sort">ID&nbsp;</th>
+                <th class="noWrap" custom-sort order="'node.foreignSource'" sort="sort">Foreign Source&nbsp;</th>
+                <th class="noWrap" custom-sort order="'nodeId'" sort="sort">Node&nbsp;</th>
+                <th class="noWrap" custom-sort order="'ipAddress'" sort="sort">Interface&nbsp;</th>
+                <th class="noWrap" custom-sort order="'monitoredService.serviceName'" sort="sort">Service&nbsp;</th>
+                <th class="noWrap" custom-sort order="'outage.ifLostService'" sort="sort">Down&nbsp;</th>
+                <th class="noWrap" custom-sort order="'outage.ifRegainedService'" sort="sort">Up&nbsp;</th>
+            </tr>
+        </thead>
+        <tfoot class="onms">
+        <td colspan="7">
+            <div class="pull-right">
+                <ul class="pagination">
+                    <li ng-class="{disabled: currentPage == 0}">
+                        <a ng-href ng-click="firstPage()">First</a>
+                    </li>
+                    <li ng-class="{disabled: currentPage == 0}">
+                        <a ng-href ng-click="prevPage()">« Prev</a>
+                    </li>
 
-            <!-- foreign source -->
-            <td class="noWrap" data-title="'ForeignSource'" sortable="'node.foreignSource'" filter="{ 'node.foreignSource': 'text' }">
-                <span ui-if="outage.node.foreignSource">
-                    <a ng-href="#/node/{{outage.node.foreignSource}}">{{outage.node.foreignSource}}</a>
-                </span>
-            </td>
+                    <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap)"
+                        ng-class="{active: n == currentPage}"
+                        ng-click="setPage()">
+                        <a ng-href ng-bind="n + 1">1</a>
+                    </li>
 
-            <!-- node -->
-            <td class="noWrap" data-title="'Node'" sortable="'nodeId'" filter="{ 'nodeId': 'text' }">
-                <span ui-if="outage.nodeId">
-                    <a ng-href="#/node/{{outage.nodeId}}" title="{{outage.serviceLostEvent.nodeLabel}}">{{outage.serviceLostEvent.nodeLabel}}</a>
-                </span>
-            </td>
-
-            <!-- interface -->
-            <td class="noWrap" data-title="'Interface'" sortable="'ipAddress'" filter="{ 'ipAddress': 'text' }">
-                <span ui-if="outage.ipAddress">
-                    <a ui-if="outage.nodeId" ng-href="#/node/{{outage.nodeId}}/interface/{{outage.ipAddress}}" title="More info on this interface">{{outage.ipAddress}}</a>
-                    <ui-if="!outage.nodeId">{{outage.ipAddress}}</ui-if>
-                </span>
-            </td>
-
-            <!-- service -->
-            <td class="noWrap" data-title="'Service'" sortable="'ifserviceId'" filter="{ 'ifserviceId': 'text' }">
-                <span ui-if="outage.serviceId">
-                    <a ui-if="outage.nodeId && outage.ipAddress" ng-href="#/node/{{outage.nodeId}}/interface/{{outage.ipAddress}}/service/{{outage.serviceId}}" title="More info on this service">{{outage.monitoredService.serviceName}}</a>
-                    <ui-if="!outage.nodeId && !outage.ipAddress">{{outage.monitoredService.serviceName}}</ui-if>
-                </span>
-            </td>
-
-            <!-- lost service time -->
-            <td class="noWrap" data-title="'Down'" sortable="'ifLostService'" filter="{ 'ifLostService': 'text' }">
-                {{outage.ifLostService| date:'MM/dd/yy HH:mm:ss' }}
-            </td>
-
-            <!-- regained service time -->
-            <td class="noWrap" data-title="'Up'" sortable="'ifRegainedService'" filter="{ 'ifRegainedService': 'text' }">
-                <span ui-if="outage.ifRegainedService">{{outage.ifRegainedService| date:'MM/dd/yy HH:mm:ss' }}</span>
-                <span ui-if="!outage.ifRegainedService">{{getStatusLabel(outage)}}</span>
-            </td>
-        </tr>
+                    <li ng-class="{disabled: (currentPage) == pagedItems.length - 1}">
+                        <a ng-href ng-click="nextPage()">Next »</a>
+                    </li>
+                    <li ng-class="{disabled: currentPage == pagedItems.length}">
+                        <a ng-href ng-click="lastPage()">Last</a>
+                    </li>
+                </ul>
+            </div>
+        </td>
+        </tfoot>
+        <pre>pagedItems.length: {{pagedItems.length|json}}</pre>
+        <pre>items.length: {{items.length|json}}</pre>
+        <pre>currentPage: {{currentPage|json}}</pre>
+        <pre>currentPage: {{sort|json}}</pre>
+        <tbody>
+            <tr ng-repeat="outage in pagedItems[currentPage]| orderBy:sort.sortingOrder:sort.reverse">
+                <td><a href="#/outages/{{outage.id}}">{{outage.id}}</a></td>
+                <td>
+                    <span ui-if="outage.node.foreignSource">
+                        <a ng-href="#/node/{{outage.node.foreignSource}}">{{outage.node.foreignSource}}</a>
+                    </span>
+                </td>
+                <td>
+                    <span ui-if="outage.nodeId">
+                        <a ng-href="#/node/{{outage.nodeId}}" title="{{outage.serviceLostEvent.nodeLabel}}">{{outage.serviceLostEvent.nodeLabel}}</a>
+                    </span>
+                </td>
+                <td>
+                    <span ui-if="outage.ipAddress">
+                        <a ui-if="outage.nodeId" ng-href="#/node/{{outage.nodeId}}/interface/{{outage.ipAddress}}" title="More info on this interface">{{outage.ipAddress}}</a>
+                        <ui-if="!outage.nodeId">{{outage.ipAddress}}</ui-if>
+                    </span>
+                </td>
+                <td>
+                    <span ui-if="outage.serviceId">
+                        <a ui-if="outage.nodeId && outage.ipAddress" ng-href="#/node/{{outage.nodeId}}/interface/{{outage.ipAddress}}/service/{{outage.serviceId}}" title="More info on this service">{{outage.monitoredService.serviceName}}</a>
+                    <span ui-if="!(outage.nodeId !== null && outage.ipAddress !== null)">{{outage.monitoredService.serviceName}}</span>
+                    </span>
+                </td>
+                <td>{{outage.ifLostService| date:'MM/dd/yy HH:mm:ss'}}</td>
+                <td>
+                    <span ui-if="outage.ifRegainedService">{{outage.ifRegainedService| date:'MM/dd/yy HH:mm:ss' }}</span>
+                    <span ui-if="!outage.ifRegainedService">{{getStatusLabel(outage)}}</span>
+                </td>
+            </tr>
+        </tbody>
     </table>
 </div>
 <!-- % if( outageCount > 0 ) { %>

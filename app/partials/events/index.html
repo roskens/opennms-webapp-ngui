@@ -1,0 +1,73 @@
+<!-- jsp:include page="/includes/header.jsp" flush="false" >
+  <jsp:param name="title" value="Events" />
+  <jsp:param name="headTitle" value="Events" />
+  <jsp:param name="location" value="event" />  
+  <jsp:param name="breadcrumb" value="Events" />
+  <jsp:param name="script" value="<script type='text/javascript' src='js/tooltip.js'></script>" />
+</jsp:include -->
+
+<div class="TwoColLeft">
+    <h3>Event Queries</h3>
+    <div class="boxWrapper" ng-controller="EventsController">
+        <p align="right">
+            <label for="id">Event ID:</label>
+            <input ng-model="id" type="text" name="id" />
+            <button ng-href="#/events/{{id}}">Get details</button>
+        </p>
+        <ul class="plain">
+            <li><a href="#/events/list" title="View all outstanding events">All events</a></li>
+            <li><a href="#/events/search" title="More advanced searching and sorting options">Advanced Search</a></li>
+        </ul>
+    </div>
+    <br/>
+    <h3>Event Filter Favorites</h3>
+    <div class="boxWrapper">
+        <!-- Filters -->
+        <!-- Tooltips for filters -->
+        <!-- c:forEach var="eachFavorite" items="${favorites}">
+            <div class="tooltip" style="" id="${eachFavorite.id}">
+                <p><b>Filter: </b><br/>
+                <onms:filters
+                    context="/event/index"
+                    favorite="${eachFavorite}"
+                    parameters="${parms}"
+                    showRemoveLink="false"
+                    showAcknowledgeFilter="false"
+                    callback="${callback}" />
+                </p>
+            </div>
+        </c:forEach -->
+        <ul class="plain" ui-if="favorites.length">
+            <li ng-repeat="favorite in favorites">
+                <img src="images/ui-trans_1x1.png" class="info" ng-onMouseOver="showTT('${favorite.id}')" onMouseOut="hideTT()"/>
+                <a href="#/events/list?favoriteId={{favorite.id}}&{{favorite.filter}}" title='show events for this favorite'>{{favorite.name}}</a>
+                [ <a href="#/events/deleteFavorite?favoriteId={{favorite.id}}" title='delete favorite'>X</a> ]
+            </li>
+        </ul>
+        <p ui-if="!favorites.length">No favorites available.</p>
+    </div>
+</div>
+
+<div class="TwoColRight">
+    <h3>Outstanding and acknowledged events</h3>
+    <div class="boxWrapper">
+        <p>Events can be <em>acknowledged</em>, or removed from the view of other users, by
+            selecting the event in the <em>Ack</em> check box and clicking the <em>Acknowledge
+                Selected Events</em> at the bottom of the page.  Acknowledging an event gives
+            users the ability to take personal responsibility for addressing a network
+            or systems-related issue.  Any event that has not been acknowledged is
+            active in all users' browsers and is considered <em>outstanding</em>.
+        </p>
+
+        <p>If an event has been acknowledged in error, you can select the 
+            <em>View all acknowledged events</em> link, find the event, and <em>unacknowledge</em> it,
+            making it available again to all users' views.
+        </p>
+
+        <p>If you have a specific event identifier for which you want a detailed event
+            description, type the identifier into the <em>Get details for Event ID</em> box and
+            hit <b>[Enter]</b>.  You will then go to the appropriate details page.
+        </p>
+    </div>
+</div>
+<hr />

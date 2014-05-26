@@ -9,9 +9,9 @@
         <title>OpenNMS Web Console</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="css/app.css"/>
-        <link rel="stylesheet" href="bower_components/angular-ui/build/angular-ui.css"/>
-        <link rel="stylesheet" href="bower_components/ng-table/ng-table.css"/>
+        <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.css"/>
+        <link rel="stylesheet" type="text/css" href="bower_components/angular-ui/build/angular-ui.css"/>
+        <link rel="stylesheet" type="text/css" href="css/app.css"/>
         <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
     </head>
     <body ng-controller="onmsController">
@@ -34,7 +34,7 @@
             </div>
             <hr />
             <div id="headernavbarright" ng-switch on="!page.nonavbar && user.loggedin">
-                <div ng-switch-when="true" class="navbar" ng-controller="NavBarController">
+                <div ng-switch-when="true" class="onms-navbar" ng-controller="NavBarController">
                     <ul>
                         <li ng-repeat="link in links">
                             <a href="{{link.url}}" ng-if="link.display">{{link.name}}</a>
@@ -88,7 +88,7 @@
         <script src="bower_components/angular-resource/angular-resource.js"></script>
         <script src="bower_components/angular-ui/build/angular-ui.js"></script>
         <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
-        <script src="bower_components/ng-table/ng-table.js"></script>
+        <script src="app/js/angular-ui-bootstrap/ui-bootstrap.js"></script>
         <script src="js/app.js"></script>
         <script src="js/services.js"></script>
         <script src="js/controllers.js"></script>
