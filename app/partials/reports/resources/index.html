@@ -1,0 +1,47 @@
+<!-- jsp:include page="/includes/header.jsp" flush="false" >
+  <jsp:param name="title" value="Resource Graphs" />
+  <jsp:param name="headTitle" value="Resource Graphs" />
+  <jsp:param name="headTitle" value="Reports" />
+  <jsp:param name="location" value="performance" />
+  <jsp:param name="breadcrumb" value="<a href='report/index.jsp'>Reports</a>" />
+  <jsp:param name="breadcrumb" value="Resource Graphs" />
+</jsp:include -->
+
+<div ng-controller="ReportsResourcesController">
+    <div class="TwoColLeft">
+        <h3 class="o-box">Standard Resource<br/>Performance Reports</h3>
+        <div class="boxWrapper">
+            <p>
+                Choose a resource for a standard performance report.
+            </p>
+            <opennms-reports-resources items="standardResources"></opennms-reports-resources>
+        </div>
+
+        <h3 class="o-box">Custom Resource<br/>Performance Reports</h3>
+        <div class="boxWrapper">
+            <p>
+                Choose a resource for a custom performance report.
+            </p>
+            <opennms-reports-resources items="customResources"></opennms-reports-resources>
+        </div>
+    </div>
+
+    <div class="TwoColRight">
+
+        <h3 class="o-box" align=center>Network Performance Data</h3>
+        <div class="boxWrapper">
+            <p>
+                The <strong>Standard Performance Reports</strong> provide a stock way to
+                easily visualize the critical SNMP data collected from managed nodes
+                and interfaces throughout your network.
+            </p>
+
+            <p>
+                <strong>Custom Performance Reports</strong> can be used to produce a
+                single graph that contains the data of your choice from a single
+                interface or node.  You can select the timeframe, line colors, line
+                styles, and title of the graph and you can bookmark the results.
+            </p>
+        </div>
+    </div>
+</div>

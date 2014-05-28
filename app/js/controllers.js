@@ -504,9 +504,6 @@ angular.module('opennms.controllers', ['ngResource'])
     .controller('MapsController', ['$scope', function($scope) {
 
         }])
-    .controller('AdminController', ['$scope', function($scope) {
-
-        }])
     .controller('SupportController', ['$scope', function($scope) {
 
         }]);

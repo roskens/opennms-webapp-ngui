@@ -1,0 +1,167 @@
+<!-- jsp:include page="/includes/header.jsp" flush="false" >
+  <jsp:param name="title" value="User Detail" />
+  <jsp:param name="breadcrumb" value="<a href='admin/index.jsp'>Admin</a>" />
+  <jsp:param name="breadcrumb" value="<a href='admin/userGroupView/index.jsp'>Users and Groups</a>" />
+  <jsp:param name="breadcrumb" value="<a href='admin/userGroupView/users/list.jsp'>User List</a>" />
+  <jsp:param name="breadcrumb" value="User Detail" />
+</jsp:include -->
+<div ng-controller="AdminUsersUsersDetailController">
+    <table>
+        <tr>
+            <td>
+                <h2>Details for User: {{user['user-id']}} <span ng-if="isReadOnly(user)">(Read Only)</span></h2>
+                <table>
+                    <tr>
+                        <td width="10%" valign="top">
+                            <strong>Full Name:</strong>
+                        </td>
+                        <td width="90%" valign="top">
+                            {{user['full-name']}}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td width="10%" valign="top"> 
+                            <strong>Comments:</strong>
+                        </td>
+                        <td width="90%" valign="top">
+                            {{user['user-comments']}}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table width="100%">
+                    <tr>
+                        <td>
+                            <table>
+                                <tr>
+                                    <td>
+                                        <strong>Notification Information</strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="10%" valign="top">
+                                        <strong>Email:</strong>
+                                    </td>
+                                    <td width="90%" valign="top">
+                                        {{user.email}}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td width="10%" valign="top">
+                                        <strong>Pager Email:</strong>
+                                    </td>
+                                    <td width="90%" valign="top">
+                                        {{user['pager-email']}}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td width="10%" valign="top">
+                                        <strong>XMPP Address:</strong>
+                                    </td>
+                                    <td width="90%" valign="top">
+                                        {{user['xmpp-address']}}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td width="10%" valign="top">
+                                        <strong>Numerical Service:</strong>
+                                    </td>
+                                    <td width="90%" valign="top">
+                                        {{user['numeric-pager']}}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td width="10%" valign="top">
+                                        <strong>Numerical Pin:</strong>
+                                    </td>
+                                    <td width="90%" valign="top">
+                                        {{user['numeric-pin']}}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td width="10%" valign="top">
+                                        <strong>Text Service:</strong>
+                                    </td>
+                                    <td width="90%" valign="top">
+                                        {{user['text-pager']}}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td width="10%" valign="top">
+                                        <strong>Text Pin:</strong>
+                                    </td>
+                                    <td width="90%" valign="top">
+                                        {{user['text-pin']}}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td width="10%" valign="top">
+                                        <strong>Work Phone:</strong>
+                                    </td>
+                                    <td width="90%" valign="top">
+                                        {{user['work-phone']}}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td width="10%" valign="top">
+                                        <strong>Mobile Phone:</strong>
+                                    </td>
+                                    <td width="90%" valign="top">
+                                        {{user['mobile-phone']}}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td width="10%" valign="top">
+                                        <strong>Home Phone:</strong>
+                                    </td>
+                                    <td width="90%" valign="top">
+                                        {{user['home-phone']}}
+                                    </td>
+                                </tr>
+
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <strong>Duty Schedules:</strong>
+
+                            <table width="50%" border="1">
+                                <tbody ng-repeat="schedule in user['duty-schedule']">
+                                    <tr ng-repeat="day in [0, 1, 2, 3, 4, 5, 6, 7, 8]">
+                                        <!-- ChoiceFormat days = new ChoiceFormat("0#Mo|1#Tu|2#We|3#Th|4#Fr|5#Sa|6#Su"); -->
+                                        <td width="5%">
+                                            {{validDay(schedule, day)}}
+                                            <!-- %= (curDay.booleanValue() ? days.format(j) : "X")% -->
+                                        </td>
+                                        <td width="5%">
+                                            {{schedule[7]}}
+                                        </td>
+                                        <td width="5%">
+                                            {{schedule[8]}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>

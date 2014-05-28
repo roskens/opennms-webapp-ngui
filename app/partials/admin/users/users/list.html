@@ -1,0 +1,119 @@
+<!-- jsp:include page="/includes/header.jsp" flush="false" >
+  <jsp:param name="title" value="User Configuration" />
+  <jsp:param name="headTitle" value="List" />
+  <jsp:param name="headTitle" value="Users" />
+  <jsp:param name="headTitle" value="Admin" />
+  <jsp:param name="breadcrumb" value="<a href='admin/index.jsp'>Admin</a>" />
+  <jsp:param name="breadcrumb" value="<a href='admin/userGroupView/index.jsp'>Users and Groups</a>" />
+  <jsp:param name="breadcrumb" value="User List" />
+</jsp:include -->
+
+<!-- script type="text/javascript" >
+
+    function addNewUser()
+    {
+        document.allUsers.action="admin/userGroupView/users/newUser.jsp?action=new";
+        document.allUsers.submit();
+        
+    }
+    
+    function detailUser(userID)
+    {
+        document.allUsers.action="admin/userGroupView/users/userDetail.jsp?userID=" + userID;
+        document.allUsers.submit();
+    }
+    
+    function deleteUser(userID)
+    {
+        document.allUsers.action="admin/userGroupView/users/deleteUser";
+        document.allUsers.userID.value=userID;
+        document.allUsers.submit();
+    }
+    
+    function modifyUser(userID)
+    {
+        document.allUsers.action="admin/userGroupView/users/modifyUser";
+        document.allUsers.userID.value=userID;
+        document.allUsers.submit();
+    }
+    
+    function renameUser(userID)
+    {
+        document.allUsers.userID.value=userID;
+        var newID = prompt("Enter new name for user.", userID);
+        
+        if (newID != null && newID != "")
+        {
+          document.allUsers.newID.value = newID;
+          document.allUsers.action="admin/userGroupView/users/renameUser";
+          document.allUsers.submit();
+        }
+    }
+    
+</script -->
+<div ng-controller="AdminUsersUsersController">
+    <h3>User Configuration</h3>
+
+    <div>
+        Click on the <i>User ID</i> link to view detailed information about a
+        user.
+    </div>
+
+    <div>
+        <a ng-href="addUser()">
+            <i class="fa fa-plus-circle fa-2x"></i> Add new user
+        </a>
+    </div>
+
+    <table class="table table-bordered table-condensed table-striped">
+        <thead>
+            <tr>
+                <th width="5%">Delete</th>
+                <th width="5%">Modify</th>
+                <th width="5%">Rename</th>
+                <th width="5%">User ID</th>
+                <th width="15%">Full Name</th>
+                <th width="15%">Email</th>
+                <th width="15%">Pager Email</th>
+                <th width="15%">XMPP Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat-start="user in items">
+                <td rowspan="2" align="center"> 
+                    <a ng-if="user !== null" ng-href="deleteUser(user)" ng-click="confirm('Are you sure you want to delete the user {{user.id}}?')">
+                        <i class="fa fa-trash-o fa-2x"></i>
+                    </a> 
+                    <i ng-if="user === null" class="fa fa-trash-o fa-2x" ng-click="alert('Sorry, the admin user cannot be deleted.')"></i>
+                </td>
+                <td rowspan="2" align="center">
+                    <a ng-href="modifyUser(user)"><i class="fa fa-edit fa-2x"></i></a>
+                </td>
+                <td rowspan="2" align="center">
+                    <button class="btn" ng-if="true" value="Rename" ng-click="renameUser(user)"></button>
+                    <button class="btn" ng-if="false" value="Rename" ng-click="alert('Sorry, the admin user cannot be renamed.')"></button>
+                </td>
+                <td>
+                    <a ng-href="#/admin/users/users/{{user['user-id']}}">{{user['user-id']}}</a>
+                </td>
+                <td>
+                    {{user['full-name']}}
+                </td>
+                <td>
+                    {{user.email}}
+                </td>
+                <td>
+                    {{user.pagerEmail}}
+                </td>
+                <td>
+                    {{user.xmppAddress}}
+                </td>
+            </tr>
+            <tr ng-repeat-end>
+                <td colspan="5">
+                    {{user['user-comments']}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

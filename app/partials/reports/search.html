@@ -1,0 +1,128 @@
+<!-- jsp:include page="/includes/header.jsp" flush="false" >
+  <jsp:param name="title" value="Advanced Event Search" />
+  <jsp:param name="headTitle" value="Advanced Search" />
+  <jsp:param name="headTitle" value="Events" />
+  <jsp:param name="breadcrumb" value="<a href='event/index'>Events</a>" />
+  <jsp:param name="breadcrumb" value="Advanced Event Search" />
+</jsp:include -->
+<div ng-controller="EventSearchController">
+    <div id="contentleft">
+        <h3>Advanced Event Search</h3>
+
+        <form action="#/events/query" method="get">
+            <table width="100%">
+                <tr>
+                    <td valign="top">
+                        <table width="100%">
+                            <tr>
+                                <td>Event Text Contains:</td>
+                                <td>TCP/IP Address Like:</td>
+                            </tr>
+
+                            <tr>
+                                <td><input type="text" name="msgsub" /></td>
+                                <td><input type="text" name="iplike" value="" /></td>
+                            </tr>
+
+                            <tr>
+                                <td>Node Label Contains:</td>
+                                <td>Severity:</td>
+                            </tr>
+
+                            <tr>
+                                <td><input type="text" name="nodenamelike" /></td>
+                                <td>
+                                    <select name="severity" size="1">
+                                        <option selected="selected">Any</option>
+                                        <option ng-repeat="s in severities" value="{{s.id}}">{{s.label}}</option>
+                                    </select>
+                                </td>
+                            </tr>
+
+                            <tr><td colspan="2">Exact Event UEI:</td></tr>
+                            <tr><td colspan="2"><input type="text" name="exactuei" size="64" maxlength="128" /></td></tr>
+
+                            <tr>
+                                <td colspan="2">Service:</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <select name="service" size="1">
+                                        <option selected>Any</option>
+                                        <option ng-repeat="s in services" value="{{s.id}}">{{s.label}}</option>
+                                    </select>
+                                </td>
+                            </tr>
+
+                            <tr><td colspan="2"><hr /></td></tr>
+
+                            <tr>
+                                <td valign="top">
+                                    <input type="checkbox" name="useaftertime" value="1" />
+                                    Events After:
+                            <quick-datepicker name="afterDateTime" ng-model='afterDateTime'></quick-datepicker>
+                    </td>
+                    <td valign="top">
+                        <input type="checkbox" name="usebeforetime" value="1"/>Events Before:
+                <quick-datepicker name="beforeDateTime" ng-model='beforeDateTime'></quick-datepicker>
+                </td>
+                </tr>
+
+                <tr><td colspan="2"><hr width=100% /></td></tr>
+
+                <tr>
+                    <td>Sort By:</td>
+                    <td>Number of Events Per Page:</td>
+                </tr>
+                <tr>
+                    <td>
+                        <select name="sortby" size="1">
+                            <option value="id"           >Event ID  (Descending)</option>
+                            <option value="rev_id"       >Event ID  (Ascending) </option>
+                            <option value="severity"     >Severity  (Descending)</option>
+                            <option value="rev_severity" >Severity  (Ascending) </option>
+                            <option value="time"         >Time      (Descending)</option>
+                            <option value="rev_time"     >Time      (Ascending) </option>
+                            <option value="node"         >Node      (Ascending) </option>
+                            <option value="rev_node"     >Node      (Descending)</option>
+                            <option value="interface"    >Interface (Ascending) </option>
+                            <option value="rev_interface">Interface (Descending)</option>
+                            <option value="service"      >Service   (Ascending) </option>
+                            <option value="rev_service"  >Service   (Descending)</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="limit" size="1">
+                            <option ng-repeat="v in [10, 20, 30, 50, 100, 1000]" value="{{v}}">{{v}} events</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr><td colspan="2"><hr width=100% /></td></tr>
+
+            </table>
+            </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="submit" value="Search" />
+                </td>
+            </tr>
+            </table>
+        </form>
+    </div>
+
+    <div id="contentright">
+        <h3>Searching Instructions</h3>
+
+        <p>The <strong>Advanced Event Search</strong> page can be used to search the event list on
+            multiple fields. Fill in values for each field that you wish to use to narrow down
+            the search.</p>
+
+        <p>To select events by time, first check the box for the time range
+            that you wish to limit and then fill out the time in the boxes provided.</p>
+
+        <p>If you wish to select events within a specific time span, check <em>both</em>
+            boxes and enter the beginning and end of the range in the boxes provided.</p>
+    </div>
+</div>
