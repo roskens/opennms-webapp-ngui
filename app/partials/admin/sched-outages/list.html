@@ -1,0 +1,50 @@
+<!-- jsp:include page="/includes/header.jsp" flush="false">
+        <jsp:param name="title" value="Manage Scheduled Outages" />
+        <jsp:param name="headTitle" value="Scheduled Outages" />
+        <jsp:param name="headTitle" value="Admin" />
+        <jsp:param name="location" value="admin" />
+        <jsp:param name="breadcrumb"
+                value="<a href='admin/index.jsp'>Admin</a>" />
+        <jsp:param name="breadcrumb" value="Scheduled Outages" />
+</jsp:include -->
+<div ng-controller="AdminScheduledOutages">
+
+    <table id="outages" class="table table-bordered table-striped table-hover">
+        <thead>
+        <tr>
+            <th colspan="4">&nbsp;</th>
+            <th colspan="4">Affects...</th>
+            <th colspan="2"></th>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Nodes/Interfaces</th>
+            <th>Times</th>
+            <th>Notifications</th>
+            <th>Polling</th>
+            <th>Thresholds</th>
+            <th>Data collection</th>
+            <th colspan="2"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="outage in items" ng-class="{{'Critical' : isCurTimeInOutage(outage) == true}}" ng-class="{{'Cleared' : !isCurTimeInOutage(outage) == false}}">
+            <td>{{outage.name}}</td>
+            <td>{{getOutageType(outage)}}</td>
+            <td>
+                {{getNodesOrInterfaces(outage)}}
+            </td>
+            <td>
+                {{getOutagesTimes(outage)}}
+            </td>
+            <td class="container fa" ng-class="{{fa-check: affectsNotifications(outage)}}"></td>
+            <td class="container"><img ng-src="/images/{{affectsPolling(outage)}}" /></td>
+            <td class="container"><img ng-src="/images/{{affectsThresholds(outage)}}" /></td>
+            <td class="container"><img ng-src="/images/{{affectsCollection(outage)}}" /></td>
+            <td><a ng-click="editScheduledOutage(outage)">Edit</a></td>
+            <td><a ng-click="deleteScheduledOutage(outage)" onClick="if (!confirm('Are you sure you wish to delete this outage?')) {return false; }">Delete</a></td>
+        </tr>
+        <tbody>
+    </table>
+</div>
